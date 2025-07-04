@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: pg-nest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nest_middle_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgresql.custom.conf:/etc/postgresql/postgresql.custom.conf
+    command: >
+      postgres -c config_file=/etc/postgresql/postgresql.custom.conf
+    ports:
+      - '5432:5432'
+
+  temporal:
+    image: temporalio/auto-setup
+    container_name: temporal
+    restart: on-failure
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      DBNAME: temporal_db
+      POSTGRES_USER: postgres
+      POSTGRES_PWD: postgres
+      POSTGRES_SEEDS: postgres
+    depends_on:
+      - postgres
+    ports:
+      - '7233:7233'
+
+  temporal-ui:
+    image: temporalio/ui
+    container_name: temporal-ui
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - '8080:8080'
+    depends_on:
+      - temporal
+
+  prometheus:
+    image: prom/prometheus
+    ports: ['9090:9090']
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert_rules.yml:/etc/prometheus/alert_rules.yml
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - '9093:9093'
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+
+  grafana:
+    image: grafana/grafana
+    ports: ['3000:3000']
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+volumes:
+  pgdata:

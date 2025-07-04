@@ -1,0 +1,11 @@
+groups:
+  - name: service-health
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 0s
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Service {{ $labels.job }} is down'
+          description: '{{ $labels.instance }} has not responded'

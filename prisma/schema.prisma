@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   
+  email       String   @unique
+  password    String   @default("123456")
+  role        String   @default("user")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+
+  @@index([username])
+  @@index([role])
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  holding     Int      @default(0) 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+
+  @@index([price])
+  @@index([createdAt])
+  @@index([createdAt(sort: Desc), price])
+}
+
+model Order {
+  id         BigInt      @id
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  status     OrderStatus  @default(PENDING)
+  total      Decimal?     @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orderItems OrderItem[]
+  payment     Payment?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  total      Decimal  @db.Decimal(10, 2)
+
+  orderId    BigInt
+  productId  Int
+
+  order      Order    @relation(fields: [orderId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  orderId   BigInt      @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  amount    Decimal  @db.Decimal(10, 2)
+  method    String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}

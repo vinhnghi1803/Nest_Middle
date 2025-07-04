@@ -1,0 +1,44 @@
+// === Order Service Prisma Schema ===
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+model Order {
+  id         BigInt      @id
+  userId     Int
+  status     OrderStatus  @default(PENDING)
+  total      Decimal?     @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  total      Decimal  @db.Decimal(10, 2)
+
+  orderId    BigInt
+  productId  Int
+
+  order      Order    @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+}

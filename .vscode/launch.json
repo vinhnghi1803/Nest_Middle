@@ -1,0 +1,33 @@
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "Debug Auth Service",
+//       "type": "node",
+//       "request": "launch",
+//       "runtimeArgs": [
+//         "-r",
+//         "ts-node/register",
+//         "-r",
+//         "tsconfig-paths/register"
+//       ],
+//       "args": ["src/main.ts"],
+//       "cwd": "${workspaceFolder}/auth-service",
+//       "skipFiles": ["<node_internals>/**"]
+//     },
+//     {
+//       "name": "Debug User Service",
+//       "type": "node",
+//       "request": "launch",
+//       "runtimeArgs": [
+//         "-r",
+//         "ts-node/register",
+//         "-r",
+//         "tsconfig-paths/register"
+//       ],
+//       "args": ["src/main.ts"],
+//       "cwd": "${workspaceFolder}/user-service",
+//       "skipFiles": ["<node_internals>/**"]
+//     }
+//   ]
+// }

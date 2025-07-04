@@ -1,0 +1,18 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'vinhnghii55@gmail.com'
+  smtp_auth_username: 'vinhnghii55@gmail.com'
+  smtp_auth_password: 'bwkdmwfedvuqinzx'
+  smtp_require_tls: true
+
+route:
+  receiver: 'email-notify'
+  group_wait: 10s # Đợi 10s sau khi alert đầu tiên xuất hiện
+  group_interval: 30s # Nhóm lại cảnh báo gửi sau mỗi 1 phút
+  repeat_interval: 1m # Nếu alert chưa được giải quyết thì lặp lại sau 30 phút
+
+receivers:
+  - name: 'email-notify'
+    email_configs:
+      - to: 'vinhnghii55@gmail.com'
+        send_resolved: true

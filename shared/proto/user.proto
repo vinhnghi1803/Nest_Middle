@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  rpc Create (CreateUserRequest) returns (GenericResponse);
+  rpc FindAll (UserRequest) returns (UserListResponse);
+  rpc FindOne (FindUserByIdRequest) returns (UserResponse);
+  rpc Update (UpdateUserRequest) returns (GenericResponse);
+  rpc Remove (DeleteUserRequest) returns (GenericResponse);
+}
+
+message User {
+  int32 id = 1;
+  string username = 2;
+  string email = 3;
+  string role = 4;
+}
+
+message CreateUserRequest {
+  User user = 1; // acting user (for permission check)
+  string username = 2;
+  string email = 3;
+  string role = 4;
+  string password = 5;
+}
+
+message UpdateUserRequest {
+  User user = 1;
+  int32 id = 2;
+  string username = 3;
+  string email = 4;
+  string role = 5;
+  string password = 6;
+}
+
+message FindUserByIdRequest {
+  User user = 1;
+  int32 id = 2;
+}
+
+message DeleteUserRequest {
+  User user = 1;
+  int32 id = 2;
+}
+
+message UserRequest {
+  User user = 1;
+}
+
+message GenericResponse {
+  string message = 1;
+}
+
+message UserResponse {
+  int32 id = 1;
+  string username = 2;
+  string email = 3;
+  string role = 4;
+}
+
+message UserListResponse {
+  repeated UserResponse users = 1;
+}

@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['host.docker.internal:3001']
+
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['host.docker.internal:3002']
+
+  - job_name: 'product-service'
+    static_configs:
+      - targets: ['host.docker.internal:3003']
+
+  - job_name: 'order-service'
+    static_configs:
+      - targets: ['host.docker.internal:3004']
+
+  - job_name: 'payment-service'
+    static_configs:
+      - targets: ['host.docker.internal:3005']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['host.docker.internal:9093']
+
+rule_files:
+  - 'alert_rules.yml'
