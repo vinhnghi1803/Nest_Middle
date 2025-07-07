@@ -17,7 +17,7 @@ const packageDefinition = protoLoader.loadSync(protoPath, {
 const paymentProto = grpc.loadPackageDefinition(packageDefinition) as any;
 
 const paymentClient = new paymentProto.payment.PaymentService(
-  `localhost:${process.env.PAYMENT_SERVICE_PORT || 50055}`,
+  `localhost:${process.env.PAYMENT_GRPC_PORT || 50055}`,
   grpc.credentials.createInsecure(),
 );
 

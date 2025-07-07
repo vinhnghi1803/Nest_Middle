@@ -18,7 +18,7 @@ const packageDefinition = protoLoader.loadSync(protoPath, {
 const proto = grpc.loadPackageDefinition(packageDefinition) as any;
 
 const client = new proto.order.OrderService(
-  `localhost:${process.env.ORDER_SERVICE_PORT || 50054}`,
+  `localhost:${process.env.ORDER_GRPC_PORT || 50054}`,
   grpc.credentials.createInsecure(),
 );
 
