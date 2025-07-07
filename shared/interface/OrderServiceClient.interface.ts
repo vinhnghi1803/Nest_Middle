@@ -15,7 +15,7 @@ export interface OrderResponse {
 
 export interface CreateOrderRequest {
   id: string;
-  userId: number;
+  user: any;
   orderItems: OrderItem[];
 }
 
