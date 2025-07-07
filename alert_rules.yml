@@ -3,9 +3,9 @@ groups:
     rules:
       - alert: ServiceDown
         expr: up == 0
-        for: 0s
+        for: 30s
         labels:
           severity: critical
         annotations:
           summary: 'Service {{ $labels.job }} is down'
-          description: '{{ $labels.instance }} has not responded'
+          description: '{{ $labels.instance }} has not responded for 30 seconds.'
