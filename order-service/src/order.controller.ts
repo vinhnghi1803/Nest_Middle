@@ -38,15 +38,18 @@ export class OrderController {
   @Post('create')
   async startOrderSaga(@Req() req, @Body() dto: CreateOrderRequest) {
     const orderId = BigInt(Date.now()).toString(); // Generate a unique order ID based on timestamp
-    const body = { ...dto, id: orderId, userId: req.user.id };
+    const body = {
+      ...dto,
+      id: orderId,
+      user: req.user,
+    };
     const workflowId = `order-${orderId}`;
-
     await this.temporalClient.start('OrderSagaWorkflow', {
       taskQueue: 'order-saga',
       workflowId,
       args: [body],
       retry: {
-        maximumAttempts: 1,
+        maximumAttempts: 3,
         initialInterval: '2s',
         backoffCoefficient: 2,
       },

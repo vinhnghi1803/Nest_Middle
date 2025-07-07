@@ -1,20 +1,18 @@
 import { Body, Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { OrderService } from './order.service';
-import { OrderItemDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderRequest } from '@shared/interface/OrderServiceClient.interface';
 
 @Controller()
 export class OrderGrpcController {
   constructor(private readonly orderService: OrderService) {}
 
   @GrpcMethod('OrderService', 'createOrder')
-  async createOrder(
-    @Body() data: { id: string; userId: number; orderItems: OrderItemDto[] },
-  ) {
+  async createOrder(@Body() data: CreateOrderRequest) {
     return this.orderService.createOrderGRPC(
       data.id,
-      data.userId,
+      data.user,
       data.orderItems,
     );
   }
