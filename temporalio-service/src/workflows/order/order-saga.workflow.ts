@@ -3,12 +3,12 @@ import {
   defineSignal,
   setHandler,
   condition,
-  sleep,
 } from '@temporalio/workflow';
 
 import type * as order_act from './activities/order.activity';
 import type * as product_act from './activities/product.activity';
 import type * as payment_act from './activities/payment.activity';
+import type * as noti_act from './activities/notification.activity';
 import { CreateOrderRequest } from '@shared/interface/OrderServiceClient.interface';
 
 // Define signal
@@ -22,16 +22,17 @@ const {
   ReserveStock,
   RollbackStock,
   processPaymentActivity,
-} = proxyActivities<typeof order_act & typeof product_act & typeof payment_act>(
-  {
-    startToCloseTimeout: '10 seconds',
-    retry: {
-      maximumAttempts: 1,
-      initialInterval: '2s',
-      backoffCoefficient: 2,
-    },
+  sendEmail,
+} = proxyActivities<
+  typeof order_act & typeof product_act & typeof payment_act & typeof noti_act
+>({
+  startToCloseTimeout: '10 seconds',
+  retry: {
+    maximumAttempts: 3,
+    initialInterval: '2s',
+    backoffCoefficient: 2,
   },
-);
+});
 
 export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
   let paymentDone = false;
@@ -83,6 +84,15 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
     // Step 4: Process payment record (record to DB)
     await processPaymentActivity(order.id, order.total, 'tay');
     paymentRecorded = true;
+
+    // Step 5: Send email to user and admin
+
+    await sendEmail(
+      orderData.id,
+      orderData.user.username,
+      orderData.user.email,
+    );
+
     // ✅ Done
   } catch (err) {
     if (!paymentDone) {

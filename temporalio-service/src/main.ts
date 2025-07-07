@@ -2,7 +2,7 @@ import { Worker } from '@temporalio/worker';
 import * as OrderActivities from './workflows/order/activities/order.activity';
 import * as ProductActivities from './workflows/order/activities/product.activity';
 import * as PaymentActivities from './workflows/order/activities/payment.activity';
-
+import * as NotificationActivities from './workflows/order/activities/notification.activity';
 // Start a Temporal worker
 async function run() {
   const worker = await Worker.create({
@@ -11,6 +11,7 @@ async function run() {
       ...OrderActivities,
       ...ProductActivities,
       ...PaymentActivities,
+      ...NotificationActivities,
     },
     taskQueue: 'order-saga',
   });
