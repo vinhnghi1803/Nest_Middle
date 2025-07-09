@@ -21,14 +21,31 @@ const paymentClient = new paymentProto.payment.PaymentService(
   grpc.credentials.createInsecure(),
 );
 
-export async function processPaymentActivity(
+// Activity: Create Payment Checkout Session with Stripe
+export async function createCheckoutSession(
   orderId: string,
   amount: Decimal,
-  method: string,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    paymentClient.recordPayment(
-      { orderId, amount, method },
+    paymentClient.CreateCheckoutSession(
+      {
+        orderId,
+        amount,
+        successUrl: `http://localhost:65535/success/${orderId}`,
+        cancelUrl: `http://localhost:65535/cancel/${orderId}`,
+      },
+      (err: Error, response: { url: string }) => {
+        if (err) return reject(err);
+        resolve(response.url);
+      },
+    );
+  });
+}
+
+export async function refundPayment(paymentIntentId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    paymentClient.RefundPayment(
+      { paymentIntentId },
       (err: Error, response: any) => {
         if (err) return reject(err);
         resolve(response);

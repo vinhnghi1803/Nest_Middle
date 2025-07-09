@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
+import * as express from 'express';
 
 async function bootstrap() {
   // 1. Create the main HTTP app
@@ -11,6 +12,9 @@ async function bootstrap() {
 
   const port = config.get<number>('PORT') || 3005;
   const grpcPort = config.get<string>('GRPC_PORT') || '50055';
+
+  // 1.5 Set up global prefix for HTTP routes
+  app.use('/webhook', express.raw({ type: 'application/json' }));
 
   // 2. Connect the gRPC microservice
   app.connectMicroservice<MicroserviceOptions>({

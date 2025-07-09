@@ -85,7 +85,8 @@ model OrderItem {
 
 model Payment {
   id        Int      @id @default(autoincrement())
-  orderId   BigInt      @unique
+  sessionId String   @unique
+  orderId   BigInt   @unique
   order     Order    @relation(fields: [orderId], references: [id])
   amount    Decimal  @db.Decimal(10, 2)
   method    String
