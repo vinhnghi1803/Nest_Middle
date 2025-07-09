@@ -3,16 +3,23 @@ syntax = "proto3";
 package payment;
 
 service PaymentService {
-  rpc recordPayment (request) returns (response);
+  rpc CreateCheckoutSession (CreateCheckoutSessionDto) returns (CreateCheckoutSessionResponse);
+  rpc RefundPayment (RefundPaymentDto) returns (response);
 }
 
-message request {
-  int64 orderId = 1;
-  int32 amount = 2;
-  string method = 3;
+message CreateCheckoutSessionDto {
+  string orderId = 1;
+  double amount = 2;
+  string successUrl = 3;
+  string cancelUrl = 4;
 }
 
-message response {
-  string message = 1;
+message CreateCheckoutSessionResponse  {
+  string url = 1;
 }
 
+message RefundPaymentDto {
+  string paymentIntentId = 1;
+}
+
+message response {}

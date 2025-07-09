@@ -9,29 +9,41 @@ export class PaymentService {
 
   async recordPayment(
     orderId: string,
+    sessionId: string,
     amount: Decimal,
     method: string,
   ): Promise<{ message: string }> {
     try {
-      console.log('Logging payment details - SERVICE:', {
-        orderId: BigInt(orderId),
-        amount,
-        method,
-      });
       await this.prisma.payment.create({
         data: {
           orderId: BigInt(orderId),
+          sessionId,
           amount,
-          status: 'PAID',
           method,
         },
       });
-      return { message: 'success' };
+      return { message: 'Pending Payment' };
     } catch (error) {
       throw new RpcException({
         code: 10, // ABORTED
         message: error.message,
       });
+    }
+  }
+
+  async updatePayment(status: string, orderId: string) {
+    try {
+      await this.prisma.payment.update({
+        where: {
+          orderId: BigInt(orderId),
+        },
+        data: {
+          status,
+        },
+      });
+      return { message: `Payment status updated to ${status}` };
+    } catch (error) {
+      throw new Error(`Failed to update payment status: ${error.message}`);
     }
   }
 }

@@ -8,6 +8,7 @@ import { PaymentController } from './payment.controller';
 import { temporalClient } from './temporal.client';
 import { ConfigModule } from '@nestjs/config';
 import { MetricsController } from './metrics/metrics.controller';
+import { StripeWebhookController } from './stripe.webhook.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,12 @@ import { MetricsController } from './metrics/metrics.controller';
       isGlobal: true,
     }),
   ],
-  controllers: [PaymentGRPCController, PaymentController, MetricsController],
+  controllers: [
+    PaymentGRPCController,
+    PaymentController,
+    MetricsController,
+    StripeWebhookController,
+  ],
   providers: [PaymentService, temporalClient],
 })
 export class AppModule {}

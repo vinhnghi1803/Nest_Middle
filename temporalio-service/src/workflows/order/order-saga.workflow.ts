@@ -3,6 +3,7 @@ import {
   defineSignal,
   setHandler,
   condition,
+  sleep,
 } from '@temporalio/workflow';
 
 import type * as order_act from './activities/order.activity';
@@ -14,6 +15,7 @@ import { CreateOrderRequest } from '@shared/interface/OrderServiceClient.interfa
 // Define signal
 export const paymentSuccess = defineSignal('paymentSuccess');
 export const paymentFailed = defineSignal('paymentFailed');
+export const setPaymentIntent = defineSignal<[string]>('setPaymentIntent');
 
 // Proxy activities
 const {
@@ -21,7 +23,8 @@ const {
   cancelOrder,
   ReserveStock,
   RollbackStock,
-  processPaymentActivity,
+  createCheckoutSession,
+  refundPayment,
   sendEmail,
 } = proxyActivities<
   typeof order_act & typeof product_act & typeof payment_act & typeof noti_act
@@ -38,7 +41,7 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
   let paymentDone = false;
   let paymentOk = true;
   let stockReserved = false;
-  let paymentRecorded = false;
+  let paymentIntent: string | null = null;
 
   // Listen to signals
   setHandler(paymentSuccess, () => {
@@ -49,6 +52,10 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
   setHandler(paymentFailed, () => {
     paymentDone = true;
     paymentOk = false;
+  });
+
+  setHandler(setPaymentIntent, (intentId: string) => {
+    paymentIntent = intentId;
   });
 
   try {
@@ -66,8 +73,15 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
 
     stockReserved = true;
 
+    await createCheckoutSession(order.id, order.total);
+
     // Step 3: Wait for payment to complete (user triggers webhook)
-    await condition(() => paymentDone);
+    await Promise.race([
+      condition(() => paymentDone),
+      sleep('2m').then(() => {
+        throw new Error('⚠️ Payment not received in time');
+      }),
+    ]);
 
     // Simulate payment server never responded
     // await Promise.race([
@@ -80,10 +94,6 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
     if (!paymentOk) {
       throw new Error('❌ Payment failed');
     }
-
-    // Step 4: Process payment record (record to DB)
-    await processPaymentActivity(order.id, order.total, 'tay');
-    paymentRecorded = true;
 
     // Step 5: Send email to user and admin
 
@@ -110,11 +120,16 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
       });
     }
 
-    if (!paymentRecorded && paymentDone && paymentOk) {
-      console.error('Payment not recorded, rolling back payment');
+    if (paymentDone && paymentOk) {
+      console.warn('⚠️ Refund may be required');
+      console.warn('Payment Intent ID:', paymentIntent);
+      try {
+        console.error('⚠️ Payment not recorded — refunding');
+        await refundPayment(paymentIntent!);
+      } catch (err) {
+        console.error('❌ Refund failed:', err.message);
+      }
     }
-
-    // await refundPaymen();
 
     console.warn('Workflow ends after handling failure:', err.message);
     return; // Propagate to show failed state
