@@ -63,5 +63,24 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
 
+  directus:
+    image: directus/directus:latest
+    ports:
+      - '8055:8055'
+    environment:
+      KEY: supersecretkey
+      ADMIN_EMAIL: admin@gmail.com
+      ADMIN_PASSWORD: admin123
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: nest_middle_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - postgres
+    volumes:
+      - ./directus/uploads:/directus/uploads
+
 volumes:
   pgdata:

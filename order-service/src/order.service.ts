@@ -116,7 +116,7 @@ export class OrderService implements OnModuleInit {
         data: { status: dto.status },
       });
 
-      console.log('Order canceled successfully:', updatedOrder);
+      console.log(`Order ${dto.orderId}: `, updatedOrder);
       return updatedOrder;
     });
   }

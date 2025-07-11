@@ -20,6 +20,7 @@ export const setPaymentIntent = defineSignal<[string]>('setPaymentIntent');
 // Proxy activities
 const {
   createOrder,
+  updateOrder,
   cancelOrder,
   ReserveStock,
   RollbackStock,
@@ -94,6 +95,8 @@ export async function OrderSagaWorkflow(orderData: CreateOrderRequest) {
     if (!paymentOk) {
       throw new Error('❌ Payment failed');
     }
+
+    await updateOrder(order.id, 'PAID');
 
     // Step 5: Send email to user and admin
 

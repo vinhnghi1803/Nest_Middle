@@ -34,6 +34,19 @@ export async function createOrder(
   });
 }
 
+// Activity: Update Order
+export async function updateOrder(
+  orderId: string,
+  status: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    client.cancelOrder({ orderId, status }, (err: Error) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+}
+
 // Activity: Cancel Order
 export async function cancelOrder(
   orderId: string,
