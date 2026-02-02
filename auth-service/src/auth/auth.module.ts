@@ -6,6 +6,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { AuthGrpcController } from './auth.grpc.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { AuthDirectusService } from './auth.directus.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { MetricsController } from './metrics/metrics.controller';
     }),
   ],
   controllers: [AuthController, AuthGrpcController, MetricsController],
-  providers: [AuthService],
+  providers: [AuthService, AuthDirectusService],
 })
 export class AuthModule {}

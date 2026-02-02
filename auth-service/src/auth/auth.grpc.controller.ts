@@ -1,14 +1,14 @@
 // src/auth/auth.grpc.controller.ts
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { AuthService } from './auth.service';
+import { AuthDirectusService } from './auth.directus.service';
 
 @Controller()
 export class AuthGrpcController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthDirectusService) {}
 
   @GrpcMethod('AuthService', 'ValidateToken')
   async validateToken(data: { token: string }) {
-    return this.authService.validateToken({ token: data.token });
+    return this.authService.validateTokenV2({ token: data.token });
   }
 }
