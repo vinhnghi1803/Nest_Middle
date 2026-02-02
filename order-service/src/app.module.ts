@@ -9,6 +9,7 @@ import { PRODUCT_SERVICE_CLIENT } from '@shared/grpc-clients/product-client.opti
 import { OrderGrpcController } from './order.grpc.controller';
 import { temporalClient } from './temporal.client';
 import { MetricsController } from './metrics/metrics.controller';
+import { DirectusService } from './directus.service';
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ import { MetricsController } from './metrics/metrics.controller';
     }),
   ],
   controllers: [OrderController, OrderGrpcController, MetricsController],
-  providers: [OrderService, temporalClient],
+  providers: [OrderService, temporalClient, DirectusService],
 })
 export class AppModule {}

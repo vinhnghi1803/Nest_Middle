@@ -29,11 +29,11 @@ export class OrderService implements OnModuleInit {
     return this.prisma.order.findMany();
   }
 
-  findOne(id: number) {
-    const order = this.prisma.order.findUnique({ where: { id } });
-    if (!order) throw new NotFoundException('Order not found');
-    return order;
-  }
+  // findOne(id: string) {
+  //   const order = this.prisma.order.findUnique({ where: { id: BigInt(id) } });
+  //   if (!order) throw new NotFoundException('Order not found');
+  //   return order;
+  // }
 
   async createOrderGRPC(
     id: string,

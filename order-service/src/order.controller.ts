@@ -16,12 +16,14 @@ import { AuthGuard } from '@shared/guard/auth.guard';
 import { RolesGuard } from '@shared/guard/roles.guard'; // Assuming you have a
 import { CreateOrderRequest } from '@shared/interface/OrderServiceClient.interface';
 import { WorkflowClient } from '@temporalio/client';
+import { DirectusService } from './directus.service';
 
 @Controller('order')
-@UseGuards(AuthGuard, RolesGuard) // Assuming you have an AuthGuard to protect the routes
+// @UseGuards(AuthGuard, RolesGuard) // Assuming you have an AuthGuard to protect the routes
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
+    private readonly directusService: DirectusService,
     @Inject('TEMPORAL_CLIENT') private readonly temporalClient: WorkflowClient,
   ) {}
 
@@ -30,10 +32,10 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.orderService.findOne(id);
+  // }
 
   @Post('create')
   async startOrderSaga(@Req() req, @Body() dto: CreateOrderRequest) {
@@ -59,5 +61,9 @@ export class OrderController {
     //   message: '✅ Order workflow started',
     //   workflowId,
     // };
+  }
+  @Get('all')
+  All() {
+    return this.directusService.getOrders();
   }
 }
